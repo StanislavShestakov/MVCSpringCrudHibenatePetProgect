@@ -1,5 +1,6 @@
 package us.shestakov.petcrud.dao;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,26 +21,48 @@ public class BookDAOImpl implements BookDAO {
 
     @Override
     public void addBook(Book book) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(book);
+        logger.info("Book sucsessfuly saved.Book details: " + book);
 
     }
 
     @Override
-    public void updateBook(int id, Book book) {
-
+    public void updateBook(Book book) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(book);
+        logger.info("Book sucsessfuly updated. Book details: " + book);
     }
 
     @Override
     public void removeBook(int id) {
+        Session session = this.sessionFactory.getCurrentSession();
+       Book book = (Book) session.load(Book.class, new Integer(id));
 
+       if(book!=null) {
+           session.delete(id);
+       }
+        logger.info("Book sucsessfuly removed. Book details: " + book);
     }
 
     @Override
     public Book getBookById(int id) {
-        return null;
+        Session session = this.sessionFactory.getCurrentSession();
+        Book book = (Book) session.load(Book.class, new Integer(id));
+        logger.info("Book sucsessfuly loaded. Book details: " + book);
+        return book;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Book> listBook() {
-        return null;
+        Session session = this.sessionFactory.getCurrentSession();
+        List<Book> bookList = session.createQuery("from Book").list();
+
+        for (Book book: bookList
+             ) {
+            logger.info("Book list: " + book);
+        }
+        return bookList;
     }
 }
